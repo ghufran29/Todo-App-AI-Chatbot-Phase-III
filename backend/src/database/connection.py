@@ -68,6 +68,8 @@ def create_db_and_tables():
     """Create all database tables based on SQLModel models."""
     from src.models.user import User
     from src.models.task import Task
+    from src.models.conversation import Conversation
+    from src.models.message import Message
 
     print("Creating database tables...")
     SQLModel.metadata.create_all(engine)

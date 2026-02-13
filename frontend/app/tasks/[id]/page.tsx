@@ -6,126 +6,90 @@ import { ProtectedRoute } from '@/src/components/auth/ProtectedRoute';
 import TaskService from '@/src/services/task_service';
 import { Task } from '@/src/types/task';
 
+const priorityBadge: Record<string, string> = {
+  urgent: 'text-red-600 bg-red-50 dark:text-red-400 dark:bg-red-500/10',
+  high: 'text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-500/10',
+  medium: 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-500/10',
+  low: 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-500/10',
+};
+
+const statusBadge: Record<string, string> = {
+  completed: 'text-green-600 bg-green-50 dark:text-green-400 dark:bg-green-500/10',
+  in_progress: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-500/10',
+  pending: 'text-yellow-600 bg-yellow-50 dark:text-yellow-400 dark:bg-yellow-500/10',
+};
+
+const priorityBorder: Record<string, string> = {
+  urgent: 'border-l-red-500', high: 'border-l-orange-500',
+  medium: 'border-l-yellow-500', low: 'border-l-green-500',
+};
+
 export default function TaskDetailPage() {
   const router = useRouter();
   const params = useParams();
   const taskId = params.id as string;
 
   const [task, setTask] = useState<Task | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [editedTitle, setEditedTitle] = useState<string>('');
-  const [editedDescription, setEditedDescription] = useState<string>('');
-  const [editedPriority, setEditedPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
-  const [editedDueDate, setEditedDueDate] = useState<string>('');
+  const [editing, setEditing] = useState(false);
+  const [title, setTitle] = useState('');
+  const [desc, setDesc] = useState('');
+  const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'urgent'>('medium');
+  const [dueDate, setDueDate] = useState('');
 
-  useEffect(() => {
-    fetchTask();
-  }, [taskId]);
+  useEffect(() => { fetchTask(); }, [taskId]);
 
   const fetchTask = async () => {
     try {
-      setLoading(true);
-      setError(null);
-      const taskData = await TaskService.getTaskById(taskId);
-      setTask(taskData);
-      setEditedTitle(taskData.title);
-      setEditedDescription(taskData.description || '');
-      setEditedPriority(taskData.priority || 'medium');
-      setEditedDueDate(taskData.due_date || '');
-    } catch (err: any) {
-      console.error('Error fetching task:', err);
-      setError(err.response?.data?.detail || 'Failed to load task');
-    } finally {
-      setLoading(false);
-    }
+      setLoading(true); setError(null);
+      const d = await TaskService.getTaskById(taskId);
+      setTask(d); setTitle(d.title); setDesc(d.description || '');
+      setPriority(d.priority || 'medium'); setDueDate(d.due_date || '');
+    } catch (err: any) { setError(err.response?.data?.detail || 'Failed to load task'); }
+    finally { setLoading(false); }
   };
 
   const handleUpdate = async () => {
-    if (!task || !task.id) return;
-
+    if (!task?.id) return;
     try {
-      setError(null);
-      const updatedTask = await TaskService.updateTask(task.id, {
-        title: editedTitle,
-        description: editedDescription,
-        priority: editedPriority,
-        due_date: editedDueDate || null,
-      });
-      setTask(updatedTask);
-      setIsEditing(false);
-    } catch (err: any) {
-      console.error('Error updating task:', err);
-      setError(err.response?.data?.detail || 'Failed to update task');
-    }
+      const u = await TaskService.updateTask(task.id, { title, description: desc, priority, due_date: dueDate || null });
+      setTask(u); setEditing(false);
+    } catch (err: any) { setError(err.response?.data?.detail || 'Failed to update task'); }
   };
 
-  const handleToggleComplete = async () => {
-    if (!task || !task.id) return;
-
-    try {
-      setError(null);
-      const completed = task.status !== 'completed';
-      const updatedTask = await TaskService.updateTaskCompletion(task.id, completed);
-      setTask(updatedTask);
-    } catch (err: any) {
-      console.error('Error updating task completion:', err);
-      setError(err.response?.data?.detail || 'Failed to update task status');
-    }
+  const handleToggle = async () => {
+    if (!task?.id) return;
+    try { setTask(await TaskService.updateTaskCompletion(task.id, task.status !== 'completed')); }
+    catch (err: any) { setError('Failed to update task status'); }
   };
 
   const handleDelete = async () => {
-    if (!task || !task.id) return;
-
-    if (!confirm('Are you sure you want to delete this task?')) {
-      return;
-    }
-
-    try {
-      setError(null);
-      await TaskService.deleteTask(task.id);
-      router.push('/tasks');
-    } catch (err: any) {
-      console.error('Error deleting task:', err);
-      setError(err.response?.data?.detail || 'Failed to delete task');
-    }
-  };
-
-  const handleCancel = () => {
-    if (!task) return;
-    setEditedTitle(task.title);
-    setEditedDescription(task.description || '');
-    setEditedPriority(task.priority || 'medium');
-    setEditedDueDate(task.due_date || '');
-    setIsEditing(false);
+    if (!task?.id || !confirm('Delete this task?')) return;
+    try { await TaskService.deleteTask(task.id); router.push('/tasks'); }
+    catch (err: any) { setError('Failed to delete task'); }
   };
 
   if (loading) {
     return (
       <ProtectedRoute>
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-indigo-500"></div>
+        <div className="flex justify-center items-center min-h-[60vh]">
+          <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
       </ProtectedRoute>
     );
   }
 
-  if (error || !task) {
+  if (!task) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 py-8">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error || 'Task not found'}</div>
-            </div>
-            <button
-              onClick={() => router.push('/tasks')}
-              className="mt-4 text-indigo-600 hover:text-indigo-800"
-            >
-              ← Back to tasks
-            </button>
+        <div className="max-w-3xl mx-auto px-4 py-12">
+          <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4">
+            <p className="text-sm text-destructive">{error || 'Task not found'}</p>
           </div>
+          <button onClick={() => router.push('/tasks')} className="text-sm text-primary hover:underline mt-4">
+            Back to tasks
+          </button>
         </div>
       </ProtectedRoute>
     );
@@ -133,179 +97,100 @@ export default function TaskDetailPage() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-gray-50 py-8">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="mb-6">
-            <button
-              onClick={() => router.push('/tasks')}
-              className="text-indigo-600 hover:text-indigo-800 mb-4"
-            >
-              ← Back to tasks
-            </button>
-            <h1 className="text-3xl font-bold text-gray-800">Task Details</h1>
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        <button onClick={() => router.push('/tasks')} className="text-sm text-muted-foreground hover:text-foreground mb-6 inline-flex items-center gap-1 transition-colors">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to tasks
+        </button>
+
+        {error && (
+          <div className="rounded-lg bg-destructive/10 border border-destructive/20 p-3 mb-4 text-sm text-destructive animate-scale-in">
+            {error}
           </div>
+        )}
 
-          {error && (
-            <div className="mb-4 rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-700">{error}</div>
-            </div>
-          )}
-
-          <div className="bg-white rounded-lg shadow-sm p-6">
-            {isEditing ? (
-              <div className="space-y-4">
+        <div className={`rounded-xl border border-border bg-card border-l-4 ${priorityBorder[task.priority || 'medium']} animate-fade-in`}>
+          <div className="p-6">
+            {editing ? (
+              <div className="space-y-4 animate-scale-in">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    value={editedTitle}
-                    onChange={(e) => setEditedTitle(e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                  />
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Title</label>
+                  <input type="text" value={title} onChange={(e) => setTitle(e.target.value)}
+                    className="w-full px-3.5 py-2.5 rounded-lg bg-input border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
-
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    value={editedDescription}
-                    onChange={(e) => setEditedDescription(e.target.value)}
-                    className="w-full p-2 border rounded-md"
-                    rows={4}
-                  />
+                  <label className="block text-sm font-medium text-foreground mb-1.5">Description</label>
+                  <textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3}
+                    className="w-full px-3.5 py-2.5 rounded-lg bg-input border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                 </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Priority
-                    </label>
-                    <select
-                      value={editedPriority}
-                      onChange={(e) => setEditedPriority(e.target.value as any)}
-                      className="w-full p-2 border rounded-md"
-                    >
-                      <option value="low">Low</option>
-                      <option value="medium">Medium</option>
-                      <option value="high">High</option>
-                      <option value="urgent">Urgent</option>
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Priority</label>
+                    <select value={priority} onChange={(e) => setPriority(e.target.value as any)}
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-input border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring">
+                      <option value="low">Low</option><option value="medium">Medium</option>
+                      <option value="high">High</option><option value="urgent">Urgent</option>
                     </select>
                   </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Due Date
-                    </label>
-                    <input
-                      type="date"
-                      value={editedDueDate}
-                      onChange={(e) => setEditedDueDate(e.target.value)}
-                      className="w-full p-2 border rounded-md"
-                    />
+                    <label className="block text-sm font-medium text-foreground mb-1.5">Due Date</label>
+                    <input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-input border border-border text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
                   </div>
                 </div>
-
-                <div className="flex space-x-3">
-                  <button
-                    onClick={handleUpdate}
-                    className="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-md"
-                  >
-                    Save Changes
-                  </button>
-                  <button
-                    onClick={handleCancel}
-                    className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md"
-                  >
-                    Cancel
-                  </button>
+                <div className="flex gap-2">
+                  <button onClick={handleUpdate} className="gradient-bg text-white px-5 py-2 rounded-lg text-sm font-medium">Save</button>
+                  <button onClick={() => { setTitle(task.title); setDesc(task.description || ''); setPriority(task.priority || 'medium'); setDueDate(task.due_date || ''); setEditing(false); }}
+                    className="bg-muted text-muted-foreground px-5 py-2 rounded-lg text-sm font-medium">Cancel</button>
                 </div>
               </div>
             ) : (
-              <div>
-                <div className="flex justify-between items-start mb-4">
-                  <h2 className={`text-2xl font-semibold ${task.status === 'completed' ? 'line-through text-gray-500' : 'text-gray-800'}`}>
+              <>
+                <div className="flex items-start justify-between gap-3 mb-4">
+                  <h1 className={`text-xl font-bold ${task.status === 'completed' ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
                     {task.title}
-                  </h2>
-                  <div className="flex space-x-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      task.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      task.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-                      'bg-yellow-100 text-yellow-800'
-                    }`}>
+                  </h1>
+                  <div className="flex gap-1.5 flex-shrink-0">
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${statusBadge[task.status || 'pending']}`}>
                       {task.status?.replace('_', ' ')}
                     </span>
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      task.priority === 'urgent' ? 'bg-red-100 text-red-800' :
-                      task.priority === 'high' ? 'bg-orange-100 text-orange-800' :
-                      task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
-                      {task.priority?.toUpperCase()}
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-semibold ${priorityBadge[task.priority || 'medium']}`}>
+                      {task.priority}
                     </span>
                   </div>
                 </div>
 
                 {task.description && (
-                  <div className="mb-4">
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Description</h3>
-                    <p className="text-gray-600">{task.description}</p>
-                  </div>
+                  <p className="text-muted-foreground text-sm leading-relaxed mb-4">{task.description}</p>
                 )}
 
-                {task.due_date && (
-                  <div className="mb-4">
-                    <h3 className="text-sm font-medium text-gray-700 mb-1">Due Date</h3>
-                    <p className="text-gray-600">{new Date(task.due_date).toLocaleDateString()}</p>
-                  </div>
-                )}
-
-                <div className="mb-4">
-                  <h3 className="text-sm font-medium text-gray-700 mb-1">Timestamps</h3>
-                  {task.created_at && (
-                    <p className="text-sm text-gray-500">
-                      Created: {new Date(task.created_at).toLocaleString()}
-                    </p>
-                  )}
-                  {task.updated_at && (
-                    <p className="text-sm text-gray-500">
-                      Updated: {new Date(task.updated_at).toLocaleString()}
-                    </p>
-                  )}
-                  {task.completed_at && (
-                    <p className="text-sm text-gray-500">
-                      Completed: {new Date(task.completed_at).toLocaleString()}
-                    </p>
-                  )}
+                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground mb-6">
+                  {task.due_date && <span>Due: {new Date(task.due_date).toLocaleDateString()}</span>}
+                  {task.created_at && <span>Created: {new Date(task.created_at).toLocaleDateString()}</span>}
+                  {task.updated_at && <span>Updated: {new Date(task.updated_at).toLocaleDateString()}</span>}
                 </div>
 
-                <div className="flex space-x-3 pt-4 border-t">
-                  <button
-                    onClick={handleToggleComplete}
-                    className={`${
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-border">
+                  <button onClick={handleToggle}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                       task.status === 'completed'
-                        ? 'bg-yellow-600 hover:bg-yellow-700'
-                        : 'bg-green-600 hover:bg-green-700'
-                    } text-white py-2 px-4 rounded-md`}
-                  >
-                    {task.status === 'completed' ? 'Mark as Incomplete' : 'Mark as Complete'}
+                        ? 'bg-yellow-50 text-yellow-700 hover:bg-yellow-100 dark:bg-yellow-500/10 dark:text-yellow-400'
+                        : 'bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-500/10 dark:text-green-400'
+                    }`}>
+                    {task.status === 'completed' ? 'Mark Incomplete' : 'Mark Complete'}
                   </button>
-                  <button
-                    onClick={() => setIsEditing(true)}
-                    className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md"
-                  >
-                    Edit Task
+                  <button onClick={() => setEditing(true)}
+                    className="px-4 py-2 rounded-lg text-sm font-medium bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+                    Edit
                   </button>
-                  <button
-                    onClick={handleDelete}
-                    className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded-md"
-                  >
-                    Delete Task
+                  <button onClick={handleDelete}
+                    className="px-4 py-2 rounded-lg text-sm font-medium bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors">
+                    Delete
                   </button>
                 </div>
-              </div>
+              </>
             )}
           </div>
         </div>

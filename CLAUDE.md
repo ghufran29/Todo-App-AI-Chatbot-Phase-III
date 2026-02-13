@@ -273,3 +273,14 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- Python 3.12 (existing backend) + FastAPI 0.109+, MCP SDK (`mcp[cli]`), SQLModel 0.0.14+ (005-mcp-task-tools)
+- Neon Serverless PostgreSQL (existing, via `backend/src/database/connection.py`) (005-mcp-task-tools)
+- Python 3.12 (existing backend) + OpenAI Agents SDK (`openai-agents`), FastAPI, SQLModel, MCP SDK (006-ai-agent-chat)
+- Neon Serverless PostgreSQL (existing) — new `conversation` and `message` tables (006-ai-agent-chat)
+- Python 3.12 (backend), TypeScript/React (frontend) + FastAPI, SQLModel, OpenAI Agents SDK (backend); OpenAI ChatKit, React (frontend) (007-chat-api-frontend)
+- Neon Serverless PostgreSQL (existing — conversation + message tables from Spec 2) (007-chat-api-frontend)
+
+## Recent Changes
+- 005-mcp-task-tools: Added Python 3.12 (existing backend) + FastAPI 0.109+, MCP SDK (`mcp[cli]`), SQLModel 0.0.14+

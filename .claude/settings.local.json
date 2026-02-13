@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(.specify/scripts/bash/setup-plan.sh:*)",
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(python3:*)"
     ]
   }
 }

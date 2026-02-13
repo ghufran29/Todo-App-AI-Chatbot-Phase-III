@@ -32,6 +32,13 @@ export const TASK_ENDPOINTS = {
   GET_TASKS_BY_USER: (userId: string) => `/users/${userId}/tasks`
 } as const;
 
+// Chat endpoints
+export const CHAT_ENDPOINTS = {
+  SEND_MESSAGE: (userId: string) => `/${userId}/chat`,
+  LIST_CONVERSATIONS: '/conversations',
+  GET_MESSAGES: (conversationId: string) => `/conversations/${conversationId}/messages`,
+} as const;
+
 /**
  * API Utility Functions
  */

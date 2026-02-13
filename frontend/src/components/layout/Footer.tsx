@@ -1,69 +1,28 @@
 'use client';
 
 import React from 'react';
-import Link from 'next/link';
 
 const Footer: React.FC = () => {
-  const currentYear = new Date().getFullYear();
-
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">TodoApp</h3>
-            <p className="text-gray-600 text-sm">
-              A secure and modern task management application with user authentication.
-            </p>
+    <footer className="border-t border-border bg-card">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-3">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded gradient-bg flex items-center justify-center">
+              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <span className="text-sm text-muted-foreground">
+              &copy; {new Date().getFullYear()} TodoAI
+            </span>
           </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Links</h3>
-            <ul className="space-y-2">
-              <li>
-                <Link href="/tasks" className="text-gray-600 hover:text-indigo-600 text-sm">
-                  My Tasks
-                </Link>
-              </li>
-              <li>
-                <Link href="/tasks/create" className="text-gray-600 hover:text-indigo-600 text-sm">
-                  Create Task
-                </Link>
-              </li>
-              <li>
-                <Link href="/profile" className="text-gray-600 hover:text-indigo-600 text-sm">
-                  Profile
-                </Link>
-              </li>
-            </ul>
+          <div className="flex items-center gap-4 text-xs text-muted-foreground/60">
+            <span>Next.js</span>
+            <span>FastAPI</span>
+            <span>OpenAI Agents</span>
+            <span>MCP</span>
           </div>
-
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Support</h3>
-            <ul className="space-y-2">
-              <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600 text-sm">
-                  Help Center
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600 text-sm">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-600 hover:text-indigo-600 text-sm">
-                  Terms of Service
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="mt-8 pt-8 border-t border-gray-200">
-          <p className="text-center text-gray-500 text-sm">
-            © {currentYear} TodoApp. All rights reserved.
-          </p>
         </div>
       </div>
     </footer>

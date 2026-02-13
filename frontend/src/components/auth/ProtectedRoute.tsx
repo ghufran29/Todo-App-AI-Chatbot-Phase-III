@@ -14,21 +14,20 @@ const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      // Redirect to login if not authenticated
       router.push('/auth/signin');
     }
   }, [isAuthenticated, loading, router]);
 
-  // Show nothing while checking authentication status
   if (loading || !isAuthenticated) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-xl">Checking authentication...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center animate-fade-in">
+          <div className="w-10 h-10 rounded-full border-2 border-primary/30 border-t-primary animate-spin mx-auto" />
+        </div>
       </div>
     );
   }
 
-  // Render children if authenticated
   return <>{children}</>;
 };
 

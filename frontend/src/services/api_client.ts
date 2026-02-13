@@ -9,7 +9,7 @@ class ApiClient {
   constructor(baseURL: string = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://helloworlds665-todo-full-stack-web-app.hf.space') {
     this.client = axios.create({
       baseURL,
-      timeout: 10000, // 10 seconds timeout
+      timeout: 30000, // 30 seconds default timeout
       headers: {
         'Content-Type': 'application/json',
       },

@@ -10,108 +10,91 @@ export default function Home() {
   const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
-    // If user is authenticated, redirect to tasks page
-    if (!loading && isAuthenticated) {
-      router.push('/tasks');
-    }
+    if (!loading && isAuthenticated) router.push('/tasks');
   }, [isAuthenticated, loading, router]);
 
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-xl">Loading...</div>
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-        <div className="text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-            Welcome to <span className="text-indigo-600">TodoApp</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            A modern, secure task management application with user authentication.
-            Organize your tasks, track progress, and boost productivity.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16">
-            <Link
-              href="/auth/signup"
-              className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition duration-200 shadow-lg hover:shadow-xl"
-            >
-              Get Started - Sign Up
-            </Link>
-            <Link
-              href="/auth/signin"
-              className="bg-white hover:bg-gray-50 text-indigo-600 px-8 py-4 rounded-lg text-lg font-semibold border-2 border-indigo-600 transition duration-200 shadow-md hover:shadow-lg"
-            >
-              Sign In
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20 max-w-5xl mx-auto">
-            <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300">
-              <div className="text-4xl mb-4">🔐</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Secure Authentication</h3>
-              <p className="text-gray-600">
-                JWT-based authentication with password strength validation and secure token management.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300">
-              <div className="text-4xl mb-4">✅</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Task Management</h3>
-              <p className="text-gray-600">
-                Create, edit, complete, and delete tasks with priority levels and due dates.
-              </p>
-            </div>
-
-            <div className="bg-white p-8 rounded-xl shadow-md hover:shadow-xl transition duration-300">
-              <div className="text-4xl mb-4">🔒</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Data Isolation</h3>
-              <p className="text-gray-600">
-                Your tasks are private and secure. Each user only sees their own data.
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-20 bg-white p-12 rounded-2xl shadow-xl max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Key Features</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
-              <div className="flex items-start">
-                <span className="text-green-500 text-2xl mr-3">✓</span>
-                <div>
-                  <h4 className="font-semibold text-gray-900">User Registration & Login</h4>
-                  <p className="text-gray-600 text-sm">Secure account creation with email and password</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <span className="text-green-500 text-2xl mr-3">✓</span>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Task Organization</h4>
-                  <p className="text-gray-600 text-sm">Organize tasks by priority and status</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <span className="text-green-500 text-2xl mr-3">✓</span>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Responsive Design</h4>
-                  <p className="text-gray-600 text-sm">Works seamlessly on desktop, tablet, and mobile</p>
-                </div>
-              </div>
-              <div className="flex items-start">
-                <span className="text-green-500 text-2xl mr-3">✓</span>
-                <div>
-                  <h4 className="font-semibold text-gray-900">Real-time Updates</h4>
-                  <p className="text-gray-600 text-sm">Instant UI updates when you modify tasks</p>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="min-h-[calc(100vh-8rem)]">
+      {/* Hero */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24 pb-16 text-center">
+        <div className="animate-fade-in inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary mb-6">
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Powered by AI Agent + MCP
         </div>
-      </div>
+
+        <h1 className="animate-fade-in-up text-4xl sm:text-5xl md:text-6xl font-extrabold text-foreground leading-tight mb-5">
+          Task Management{' '}
+          <span className="gradient-text">with AI</span>
+        </h1>
+
+        <p className="animate-fade-in-up delay-100 text-lg text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed">
+          Manage your tasks with natural language. Tell the AI what you need and it handles the rest through intelligent tool calling.
+        </p>
+
+        <div className="animate-fade-in-up delay-200 flex flex-col sm:flex-row gap-3 justify-center">
+          <Link
+            href="/auth/signup"
+            className="gradient-bg text-white px-7 py-3 rounded-xl text-base font-semibold hover:opacity-90 transition-opacity"
+          >
+            Get Started Free
+          </Link>
+          <Link
+            href="/auth/signin"
+            className="bg-muted text-foreground px-7 py-3 rounded-xl text-base font-semibold hover:bg-muted/80 transition-colors border border-border"
+          >
+            Sign In
+          </Link>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {[
+            {
+              icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z',
+              title: 'AI Chat Assistant',
+              desc: 'Manage tasks through natural conversation with an intelligent AI agent.',
+              color: 'text-violet-600 bg-violet-100 dark:text-violet-400 dark:bg-violet-500/10',
+            },
+            {
+              icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4',
+              title: 'Task Management',
+              desc: 'Create, edit, prioritize, and track tasks with due dates and statuses.',
+              color: 'text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-500/10',
+            },
+            {
+              icon: 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z',
+              title: 'Secure & Private',
+              desc: 'JWT authentication with complete data isolation per user.',
+              color: 'text-emerald-600 bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-500/10',
+            },
+          ].map((f, i) => (
+            <div
+              key={f.title}
+              className={`animate-fade-in-up delay-${(i + 1) * 100} rounded-xl border border-border bg-card p-6 hover:border-primary/20 transition-colors`}
+            >
+              <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 ${f.color}`}>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={f.icon} />
+                </svg>
+              </div>
+              <h3 className="text-base font-semibold text-foreground mb-1">{f.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }
